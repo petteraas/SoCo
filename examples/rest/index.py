@@ -110,8 +110,7 @@ def create_response_object_from_device(device):
     response = {
         'url': create_link_from_device(device),
         'name': device.player_name,
-        'state': device.get_current_transport_info()['current_transport_state'],
-        'current_track': device.get_current_track_info(),
+        'is_visible': device.is_visible,
         'mode': device.play_mode,
         'mixer': {
             'treble': device.treble,
@@ -119,6 +118,21 @@ def create_response_object_from_device(device):
             'volume': device.volume
         }
     }
+    if device.group is not None:
+        response['group'] = {
+            'coordinator': create_link_from_device(device.group.coordinator),
+            'members': []
+        }
+        for member in device.group.members:
+            response['group']['members'].append(create_link_from_device(member))
+
+        response['current_track'] = device.group.coordinator.get_current_track_info()
+        response['state'] = device.group.coordinator.get_current_transport_info()['current_transport_state']
+    else:
+        response['current_track'] = device.get_current_track_info()
+        response['state'] = device.get_current_transport_info()['current_transport_state']
+
+    return response
 
 
 if __name__ == '__main__':
