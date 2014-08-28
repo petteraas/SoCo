@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
 
 import soco
 
