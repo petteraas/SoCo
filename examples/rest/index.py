@@ -91,8 +91,8 @@ def create_link_from_device(device):
     try:
         urlparts = urlparse.urlsplit(request.url)
         path = urlparts.path
-        if path is not '/{player_name}/'.format(player_name=device.player_name):
-            path = '/{player_name}/'.format(player_name=device.player_name)
+        if path is not '/{player_name}'.format(player_name=device.player_name):
+            path = '/{player_name}'.format(player_name=device.player_name)
 
         return '{scheme}://{netloc}{path}'.format(
             scheme=urlparts.scheme,
