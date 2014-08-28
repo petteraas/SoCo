@@ -35,6 +35,49 @@ def current(player_name):
     return jsonify(track)
 
 
+@app.route('/<player_name>/play', methods=["POST"])
+def play(player_name):
+    device = getDeviceByName(player_name)
+    device.play()
+    track = device.get_current_track_info()
+    return jsonify(track)
+
+
+@app.route('/<player_name>/play/<track>', methods=["POST"])
+def play_track(player_name, track):
+    device = getDeviceByName(player_name)
+    play_from_queue(device, track)
+    return jsonify(device.get_current_track_info())
+
+
+@app.route('/<player_name>/stop', methods=["POST"])
+def stop(player_name):
+    device = getDeviceByName(player_name)
+    return jsonify({'exit': device.stop()})
+
+
+def play_from_queue(device, track):
+    index = int(track)
+    queue_length = get_queue_length(device)
+
+    if is_index_in_queue(index, queue_length):
+        index -= 1
+        position = device.get_current_track_info()['playlist_position']
+        current = int(position) - 1
+        if index != current:
+            device.play_from_queue(index)
+
+
+def get_queue_length(device):
+    return len(device.get_queue())
+
+
+def is_index_in_queue(index, queue_length):
+    if index > 0 and index <= queue_length:
+        return True
+    return False
+
+
 def getDeviceByName(name):
     for device in devices:
         if device.player_name == name:
@@ -49,10 +92,10 @@ def create_link_from_device(device):
             path = '/{player_name}/'.format(player_name=device.player_name)
 
         return '{scheme}://{netloc}{path}'.format(
-                scheme=urlparts.scheme,
-                netloc=urlparts.netloc,
-                path=path
-                )
+            scheme=urlparts.scheme,
+            netloc=urlparts.netloc,
+            path=path
+        )
     except AttributeError:
         return '{url}'.format(url=request.url)
 
