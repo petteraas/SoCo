@@ -104,7 +104,10 @@ def create_link_from_device(device):
 
 
 def create_response_object_from_device(device):
-    return {
+    if not isinstance(device, soco.SoCo):
+        return {}
+
+    response = {
         'url': create_link_from_device(device),
         'name': device.player_name,
         'state': device.get_current_transport_info()['current_transport_state'],
