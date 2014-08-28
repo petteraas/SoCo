@@ -21,7 +21,7 @@ def index():
     return jsonify(response)
 
 
-@app.route('/<player_name>/', methods=["GET"])
+@app.route('/<player_name>', methods=["GET"])
 def info(player_name):
     device = getDeviceByName(player_name)
     info = create_response_object_from_device(device)
