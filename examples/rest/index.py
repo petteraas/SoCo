@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+
 try:
     import urlparse
 except ImportError:
@@ -23,21 +24,23 @@ def index():
 
 @app.route('/<player_name>', methods=["GET"])
 def info(player_name):
-    device = getDeviceByName(player_name)
-    info = create_response_object_from_device(device)
+    device = get_device_by_name(player_name)
+    info = {}
+    if isinstance(device, soco.SoCo):
+        info = create_response_object_from_device(device)
     return jsonify(info)
 
 
 @app.route('/<player_name>/current', methods=["GET"])
 def current(player_name):
-    device = getDeviceByName(player_name)
+    device = get_device_by_name(player_name)
     track = device.get_current_track_info()
     return jsonify(track)
 
 
 @app.route('/<player_name>/play', methods=["POST"])
 def play(player_name):
-    device = getDeviceByName(player_name)
+    device = get_device_by_name(player_name)
     device.play()
     track = device.get_current_track_info()
     return jsonify(track)
@@ -45,14 +48,14 @@ def play(player_name):
 
 @app.route('/<player_name>/play/<track>', methods=["POST"])
 def play_track(player_name, track):
-    device = getDeviceByName(player_name)
+    device = get_device_by_name(player_name)
     play_from_queue(device, track)
     return jsonify(device.get_current_track_info())
 
 
 @app.route('/<player_name>/stop', methods=["POST"])
 def stop(player_name):
-    device = getDeviceByName(player_name)
+    device = get_device_by_name(player_name)
     return jsonify({'exit': device.stop()})
 
 
@@ -78,7 +81,7 @@ def is_index_in_queue(index, queue_length):
     return False
 
 
-def getDeviceByName(name):
+def get_device_by_name(name):
     for device in devices:
         if device.player_name == name:
             return device
