@@ -138,6 +138,15 @@ class TestAVTransport:
             [('InstanceID', 0), ('Speed', 1)]
         )
 
+    def test_soco_play_from_queue(self, moco):
+        moco.play_from_queue(10)
+        uri = 'x-rincon-queue:{0}#0'.format(moco.uid)
+        moco.avTransport.SetAVTransportURI.assert_called_once_with([
+            ('InstanceID', 0),
+            ('CurrentURI', uri),
+            ('CurrentURIMetaData', '')
+        ])
+
     def test_soco_pause(self, moco):
         moco.pause()
         moco.avTransport.Pause.assert_called_once_with(
